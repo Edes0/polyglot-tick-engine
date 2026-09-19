@@ -46,19 +46,14 @@ hand-written, for the people who write bots against this engine.
 ## The tick
 
 ```mermaid
-flowchart TD
-    A[Tick starts] --> B[Resolve runnable players<br/>deterministic order + rotation]
-    B --> C[Capture per-player snapshot<br/>at enqueue time]
-    C --> D[Execute bots in containers<br/>parallel, host-enforced timeout]
-    D --> E[Reconcile intents<br/>pathfinding, traffic, conflicts]
-    E --> F[Simulate<br/>regen, build, lifespan, culling]
-    F --> G[Project per-player visibility]
-    G --> H[Persist: one batched flush]
-    H --> I[Broadcast deltas over WebSocket]
+flowchart LR
+    A([Tick starts]) --> B[Resolve<br/>players] --> C[Snapshot<br/>at enqueue] --> D[Execute bots<br/>in containers]
+    D --> E[Reconcile<br/>intents] --> F[Simulate] --> G[Project<br/>visibility] --> H[Persist<br/>one flush] --> I[Broadcast<br/>deltas]
     I --> A
 
-    D -.->|timeout / crash| X[Isolate that player<br/>tick continues]
-    X --> E
+    D -.->|timeout / crash| X[Isolate that player,<br/>tick continues] -.-> E
+
+    style X stroke-dasharray: 4
 ```
 
 A player's script runs **once per tick against a frozen snapshot** and returns *intents* — "move
