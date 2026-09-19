@@ -90,7 +90,7 @@ carries the parts that survive being read rather than executed: architecture, pr
 measurements, and short excerpts of the real code — quoted with the path they came from, so you can
 see what the code actually looks like without receiving a copy of it.
 
-If you are evaluating me and want to read more of it, ask.
+If you are evaluating me and want to read more of it, ask — [sjogrenandreas@live.se](mailto:sjogrenandreas@live.se).
 
 ## Licence
 
@@ -99,4 +99,4 @@ for illustration only. See [LICENSE.md](LICENSE.md).
 
 ---
 
-*Andreas Sjögren — [github.com/Edes0](https://github.com/Edes0)*
+**Andreas Sjögren** — [sjogrenandreas@live.se](mailto:sjogrenandreas@live.se) · [github.com/Edes0](https://github.com/Edes0)
