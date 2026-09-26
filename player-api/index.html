@@ -168,7 +168,8 @@
 <body>
 <div style="background:#0d1520;border-bottom:1px solid #1d2b39;padding:11px 20px;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:#9fb3c8;text-align:center">
   Reference documentation for <b style="color:#4de2c0">Screeps2</b> &mdash; a private project by Andreas Sj&ouml;gren.
-  <a href="https://github.com/Edes0/polyglot-tick-engine" style="color:#4de2c0;text-decoration:none;border-bottom:1px solid rgba(77,226,192,.4)">Read the engineering write-up &rarr;</a>
+  Written for bot authors: a public API kept small on purpose.
+  <a href="https://github.com/Edes0/polyglot-tick-engine" style="color:#4de2c0;text-decoration:none;border-bottom:1px solid rgba(77,226,192,.4)">The reasoning is in the write-up &rarr;</a>
 </div>
 
 <header class="hero">
@@ -342,7 +343,7 @@ unit.<span class="tok-fn">moveTo</span>(unit.x + <span class="tok-num">10</span>
         <tr><td><code>game.attackRange</code></td><td>float</td><td>How close a unit must be to <code>attack</code>. A game rule (melee; same reach as gather/transfer).</td></tr>
         <tr><td><code>game.visibilityAt(x, y)</code></td><td>→ str</td><td><code>"visible"</code> / <code>"explored"</code> / <code>"unseen"</code>. See <a href="#fog">§07</a>.</td></tr>
         <tr><td><code>game.terrainAt(x, y)</code></td><td>→ str</td><td><code>"normal"</code> / <code>"mountain"</code> / <code>"lava"</code> for <b>any</b> cell, explored or not — walkable is <code>== "normal"</code>. Outside the world: <code>"mountain"</code>. See <a href="#fog">§07</a>.</td></tr>
-        <tr><td><code>game.getResources(room=None)</code></td><td>→ list&lt;Resource&gt;</td><td>Same cells as <code>game.resources</code>. Use either.</td></tr>
+        <tr><td><code>game.getResources()</code></td><td>→ list&lt;Resource&gt;</td><td>Same cells as <code>game.resources</code>. Use either.</td></tr>
         <tr><td><code>game.spawnUnit(x, y, unit_type)</code></td><td>→ bool</td><td>Low-level spawn at a point. Most bots use <code>hatchery.spawnUnit(body)</code> instead — see <a href="#body">§06</a>.</td></tr>
       </tbody>
     </table>
@@ -685,28 +686,27 @@ module.exports = { play };</code></pre>
 
 <!-- 10 -->
 <section id="langs">
-  <h2><span class="num">10</span> Languages &amp; the HTTP fallback</h2>
-  <p class="sub">The object API above is the canonical surface. Not every language reaches it yet — here's the honest state.</p>
+  <h2><span class="num">10</span> Languages &amp; the HTTP bridge</h2>
+  <p class="sub">The object API above is the canonical surface. The sandbox is built for 24 languages; not every one reaches this API yet — here's the honest state.</p>
 
   <div class="table-scroll">
     <table>
-      <thead><tr><th>Language</th><th>What your <code>play</code> receives</th></tr></thead>
+      <thead><tr><th>Language</th><th>State today</th></tr></thead>
       <tbody>
         <tr><td><b>Python</b>, <b>JavaScript</b>, <b>TypeScript</b></td><td>The full <code>Game</code> / <code>Unit</code> / <code>Structure</code> / <code>Resource</code> / <code>Position</code> object API documented here, via a persistent worker.</td></tr>
-        <tr><td>~20 others (Go, Rust, C#, Java, Ruby, C/C++, Lua, Kotlin, …)</td><td>Today: a thin HTTP wrapper that hands your <code>play</code> the raw JSON game state. You call the REST endpoints below yourself. Richer per-language object clients are planned.</td></tr>
+        <tr><td>The other 21 (Go, Rust, C#, Java, Ruby, C/C++, Lua, Kotlin, …)</td><td>Docker images and build pipelines exist; each is waiting on its persistent-worker entrypoint. Until it lands, bots in these languages do not run: the older per-tick path they would have used is deliberately switched off, and the server refuses to start if anyone tries to switch it back on.</td></tr>
       </tbody>
     </table>
   </div>
 
   <h3>REST endpoints <span class="col-note" style="font-weight:400;font-size:14px">— <code>/api/v1/player/…</code></span></h3>
-  <p>Every response is a <code>{ "success": true, "data": … }</code> envelope (or <code>"errorMessage"</code> on failure).</p>
+  <p>A worker-scoped HTTP surface, authenticated with the rotating worker token. A persistent-worker bot never needs it — its tick message already carries the snapshot and its reply carries the intents — so treat this table as reference. Every response is a <code>{ "success": true, "data": … }</code> envelope (or <code>"errorMessage"</code> on failure).</p>
   <div class="table-scroll">
     <table>
       <thead><tr><th>Method &amp; path</th><th>Body / query</th></tr></thead>
       <tbody>
         <tr><td><code>GET /game</code></td><td>Your whole visible world snapshot.</td></tr>
-        <tr><td><code>GET /resources?room=</code></td><td>Visible resource cells.</td></tr>
-        <tr><td><code>GET /resource-cells</code></td><td>Resource cells (constant set).</td></tr>
+        <tr><td><code>GET /resources</code></td><td>Basic resource nodes — position and generated amount. Public by design: the static world is public, the dynamic world is fogged.</td></tr>
         <tr><td><code>GET /cell?x=&amp;y=</code></td><td>One cell's terrain + resources.</td></tr>
         <tr><td><code>POST /move</code></td><td><code>{ unitId, x, y }</code></td></tr>
         <tr><td><code>POST /gather</code></td><td><code>{ unitId, x, y }</code></td></tr>
@@ -724,18 +724,9 @@ module.exports = { play };</code></pre>
 
 <footer>
   <div class="wrap">
-    <h2>Generated from — keep this doc in sync</h2>
-    <p>This page describes the <b>runtime object surface</b> as it actually exists. When any of these change, update this file (an editor reminder fires automatically on edits to them):</p>
-    <div class="prov mono">
-      <ul class="tight">
-        <li><code>docker/images/python/worker_entrypoint.py</code> — canonical Python objects</li>
-        <li><code>docker/images/javascript/worker_entrypoint.js</code> — JS objects (<code>typescript/</code> mirrors it)</li>
-        <li><code>src/Screeps2.Application/Players/PlayerApi/*.cs</code> — wire DTOs</li>
-        <li><code>src/Screeps2.Presentation/Controllers/PlayerApiController.cs</code> — HTTP endpoints</li>
-        <li><code>docs/PLAYER_API.md</code> — the design authority (help-vs-control line)</li>
-      </ul>
-    </div>
-    <p style="margin-top:22px">Draft · player-facing companion to <code>docs/PLAYER_API.md</code>. Every field and method here is verified against the runtime <code>worker_entrypoint</code> source — the object surface a Python/JS bot actually touches.</p>
+    <h2>Where this comes from</h2>
+    <p>This page describes the <b>runtime object surface</b> as it actually exists: every field and method is checked against the in-container worker entrypoints — the objects a Python or JavaScript bot actually touches — and the HTTP table against the player API controller. It is hand-written for people who write bots, not generated.</p>
+    <p style="margin-top:22px">Why the surface is this small, and what was deliberately left out, is argued in the <a href="https://github.com/Edes0/polyglot-tick-engine/blob/main/docs/07-domain-model.md#the-api-design-line" style="color:#4de2c0">engineering write-up</a>.</p>
   </div>
 </footer>
 
