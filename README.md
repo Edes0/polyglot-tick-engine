@@ -58,7 +58,7 @@ The interesting part is not the game. It is what the game forces you to build:
 | [01 System overview](docs/01-system-overview.md) | Script results arrived after their tick closed | I reversed my own async design for lockstep, and bounded the cost with a hard kill |
 | [02 Sandboxed polyglot execution](docs/02-polyglot-sandbox.md) | Code I have never seen, in any of 24 languages | Chose one language-neutral contract over per-language branches; the tick never branches on language |
 | [03 Persistent-worker protocol](docs/03-persistent-worker-protocol.md) | A process per player per tick cost 50–100 ms | Chose a warm worker and a versioned line protocol; a scheduling race closed by construction |
-| [04 Tick pipeline and determinism](docs/04-tick-pipeline-and-determinism.md) | One unordered tie-break breaks "same inputs, same world" | Chose a total order ending in a unique id — and found two bugs no stage test could see |
+| [04 Tick pipeline and determinism](docs/04-tick-pipeline-and-determinism.md) | One unordered tie-break breaks "same inputs, same world" | Chose a total order ending in a unique id — and learned that green stage tests hid a frozen colony |
 | [05 Performance engineering](docs/05-performance-engineering.md) | A 13× regression, and my wrong explanation of it | Chose to instrument first; halved it, and left three optimisations undone on purpose |
 | [06 Fog of war](docs/06-fog-of-war.md) | A rule on the server and an effect on the client | Chose one fullscreen pass over per-shader fog, and duplicated one function deliberately |
 | [07 Domain model](docs/07-domain-model.md) | Stale comments nearly bought a 120-file refactor | Chose ADRs with a `revisit_if` and an API that never does the player's programming |

@@ -9,7 +9,7 @@ inputs, same world" is the property the whole game rests on.
 > **In short.** **Problem:** "same inputs, same world" is what the game rests on, and one unordered
 > tie-break quietly breaks it. **Decision:** twelve explicit phases, one batched flush, and a four-level
 > total order that ends in a unique id. **Outcome:** determinism enforced by replay and golden tests,
-> not by a comment — and two bugs caught that no stage-level test could see.
+> not by a comment — and a frozen colony that green stage tests had hidden.
 <!-- /budget -->
 
 ---

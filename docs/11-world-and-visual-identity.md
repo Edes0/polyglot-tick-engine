@@ -50,8 +50,8 @@ it deleted every hex file in the project, all 49, and declared hexagonal coordin
 world became procedural chunks.
 
 It did not last either. Unity can build for the browser and Unreal no longer can, and I wanted a
-browser client — a no-install watch client later shipped exactly that way. And honestly,
-Unreal was too much engine for one person learning to make a first game: everything took longer to
+browser client — a no-install watch client later shipped exactly that way. And Unreal was
+too much engine for one person learning to make a first game: everything took longer to
 build and longer to learn than the game could afford.
 
 ### Unity 3D — from February 2026
