@@ -2,14 +2,13 @@
 
 [← back to the index](../README.md)
 
-The useful story here is not a number that got smaller. It is the time I was confident about the
-cause, wrote it down, and was wrong — and what the instrument said instead.
+The tick is measured, not guessed: benchmarks at three scales, allocation counters per call site,
+and a regression traced to its real cause — which was not the one I first wrote down.
 
 <!-- budget:inshort max=60 -->
-> **In short.** **Problem:** a rewrite made move preparation 13× slower on green tests, and my written
-> explanation for the allocation was wrong. **Decision:** instrument before refactoring, and ship only
-> what the attribution justifies. **Outcome:** 2,821 → 1,409 ms and 450 → 99 MB at 5,000 entities, with
-> three optimisations deliberately left undone and their numbers kept.
+> **What it does.** Measures the tick, against committed baselines. **How it works.** BenchmarkDotNet
+> at 100 / 1,000 / 5,000 entities, plus per-call-site allocation counters. **Result.** Move preparation
+> from 2,821 ms / 450 MB to 1,409 ms / 99 MB at 5,000 entities; fog −38%; broadcast 2.0–2.3× faster.
 <!-- /budget -->
 
 **Every measurement below:** one desktop, Ryzen 7 7700X, .NET 10, BenchmarkDotNet with the

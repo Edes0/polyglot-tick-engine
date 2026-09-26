@@ -6,10 +6,10 @@ This is a game for programmers. Anything the server sends a client, a player can
 or a debugger. So the boundary is the server, and "hidden in the UI" is not hidden.
 
 <!-- budget:inshort max=60 -->
-> **In short.** **Problem:** two paths shipped information a player was not allowed to know; the
-> client merely did not show it. **Decision:** project every payload per player on the server,
-> keyed on who is authenticated, and make the public/private line explicit. **Outcome:** private data
-> is absent from the wire, not dimmed, with regression tests that read the serialised bytes.
+> **What it does.** Makes the server the trust boundary. **How it works.** Every full-state path is
+> projected per player, keyed on the authenticated player; private fields are gone from the wire; two
+> auth schemes; one fail-closed ownership guard. **Result.** Regression tests assert on the serialised
+> bytes, not on what renders.
 <!-- /budget -->
 
 ---

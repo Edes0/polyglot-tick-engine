@@ -6,10 +6,10 @@ Twelve ordered phases, one batched flush, and a total order over every decision 
 inputs, same world" is the property the whole game rests on.
 
 <!-- budget:inshort max=60 -->
-> **In short.** **Problem:** "same inputs, same world" is what the game rests on, and one unordered
-> tie-break quietly breaks it. **Decision:** twelve explicit phases, one batched flush, and a four-level
-> total order that ends in a unique id. **Outcome:** determinism enforced by replay and golden tests,
-> not by a comment — and a frozen colony that green stage tests had hidden.
+> **What it does.** Turns every player's intents into one deterministic world update. **How it
+> works.** Twelve ordered phases, one batched flush, a four-level total order that ends in a unit id,
+> and windowed A* across a partitioned world. **Result.** Byte-equal replays, pinned by replay and
+> golden tests.
 <!-- /budget -->
 
 ---

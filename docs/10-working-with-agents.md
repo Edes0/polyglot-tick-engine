@@ -9,10 +9,10 @@ has quietly stopped guarding.
 > Designed and built solo over ~10 months by Andreas Sjögren — I make the decisions and review every merge; AI coding agents implement under gates I built (see Working with agents).
 
 <!-- budget:inshort max=60 -->
-> **In short.** **Problem:** an agent is confident, fast, and does not remember last week. **Decision:**
-> repo-resident knowledge in four kinds of file, every agent audit checked against the code before
-> anyone acts on it, and gates that must be seen to fail before they are trusted. **Outcome:** audits
-> that were wrong got caught before they became refactors.
+> **What it does.** The agent workflow this is built with. **How it works.** Specs grilled before
+> planning, plans reviewed before implementation, diffs gated before merge; agent knowledge kept in
+> the repo in four homes; every audit checked against the code. **Result.** AGENTS.md cut from 113
+> files to 51, and wrong audits caught before they became refactors.
 <!-- /budget -->
 
 ---

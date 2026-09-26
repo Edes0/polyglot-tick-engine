@@ -2,14 +2,13 @@
 
 [← back to the index](../README.md)
 
-1,603 passing test cases is a number. The useful parts are the two suites that exist because .NET
-cannot reach them, and the rule that a green build proves less than it looks like it proves.
+Two test systems: one for the engine, and one for the code bots run inside their containers — the
+part `dotnet test` cannot reach. Three CI lanes run them.
 
 <!-- budget:inshort max=60 -->
-> **In short.** **Problem:** a green .NET build said nothing about the code bots actually run — the
-> Python worker suite sat red for weeks behind green CI. **Decision:** separate CI lanes for the
-> in-container workers, and a rule that wiring is proven on a running host. **Outcome:** 1,603 .NET
-> cases plus 247 worker cases on every push.
+> **What it does.** Tests the engine and the code bots actually run. **How it works.** Four xUnit
+> projects, pytest and Node suites for the in-container workers, and three CI lanes — the worker lane
+> independent of .NET. **Result.** 1,603 .NET and 247 worker cases passing in CI (2026-09-20).
 <!-- /budget -->
 
 ---

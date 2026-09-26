@@ -6,10 +6,10 @@ Eight thousand lines that depend on nothing, a handful of decisions I wrote down
 forget why, and one value object that changed shape because of a measurement.
 
 <!-- budget:inshort max=60 -->
-> **In short.** **Problem:** a domain rots through stale comments and convenient APIs. **Decision:** a
-> Domain layer that depends on nothing, ADRs that carry a `revisit_if`, and one API rule — hide engine
-> mechanics, never do the player's programming. **Outcome:** tombstone comments that nearly bought a
-> 120-file refactor were caught, and growing the world is one config change.
+> **What it does.** The domain layer: 10 aggregate roots and 33 value objects that depend on nothing.
+> **How it works.** No EF, no MediatR, no IO; ADRs that carry a `revisit_if`; one API rule — hide
+> engine mechanics, never do the player's programming. **Result.** 8,000 lines of game rules testable
+> without a database.
 <!-- /budget -->
 
 ---

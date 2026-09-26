@@ -7,10 +7,9 @@ shape as it went — hexagons, then chunks, then rectangles, then one seamless w
 engine and each bug taught me something about what a world for bots has to be.
 
 <!-- budget:inshort max=60 -->
-> **In short.** **Problem:** a solo first game needed a look, and bots needed a world without seams
-> to trip over. **Decision:** four client engines tried and one kept; hexagons given up for
-> rectangles, then for one continuous world. **Outcome:** Unity 3D, a seamless map, and coordinates
-> that behave the way a bot author expects.
+> **What it does.** The game's world and its look. **How it works.** Four client engines tried and
+> Unity 3D kept; hexagons, then rectangles, then one seamless terrain function; global flat-2D
+> coordinates for bots. **Result.** The captures below, from a 2D hex prototype to today.
 <!-- /budget -->
 
 ---

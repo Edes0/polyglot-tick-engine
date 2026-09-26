@@ -2,14 +2,13 @@
 
 [← back to the index](../README.md)
 
-The same addressing function exists twice — once in C#, once in HLSL — and they have to agree
-exactly, forever. Here is why that was the right trade.
+The server decides what each player may see and sends nothing else; the client turns that into
+three soft fog states in one fullscreen pass.
 
 <!-- budget:inshort max=60 -->
-> **In short.** **Problem:** fog is a rule on the server and an effect on the client, and conflating
-> them leaks information. **Decision:** the server omits what a player cannot see; the client renders
-> fog in one fullscreen pass, not per shader. **Outcome:** a new material cannot leak the world, at the
-> price of one mapping written twice, pinned by tests.
+> **What it does.** Fog of war on both ends. **How it works.** The server rasterises per-player vision
+> bitmaps with per-cell line of sight; the client renders one URP fullscreen pass driven by a distance
+> field. **Result.** Hidden units are never sent, and no opaque material can forget fog.
 <!-- /budget -->
 
 ---
