@@ -2,8 +2,8 @@
 
 [← back to the index](../README.md)
 
-The useful story here is not a number that got smaller. It is the time I was confident about the
-cause, wrote it down, and was wrong — and what the instrument said instead.
+The tick is measured, not guessed: benchmarks at three scales, allocation counters per call site,
+and a regression traced to its real cause — which was not the one I first wrote down.
 
 <!-- budget:inshort max=60 -->
 > **What it does.** Measures the tick, against committed baselines. **How it works.** BenchmarkDotNet

@@ -2,8 +2,8 @@
 
 [← back to the index](../README.md)
 
-1,603 passing test cases is a number. The useful parts are the two suites that exist because .NET
-cannot reach them, and the rule that a green build proves less than it looks like it proves.
+Two test systems: one for the engine, and one for the code bots run inside their containers — the
+part `dotnet test` cannot reach. Three CI lanes run them.
 
 <!-- budget:inshort max=60 -->
 > **What it does.** Tests the engine and the code bots actually run. **How it works.** Four xUnit

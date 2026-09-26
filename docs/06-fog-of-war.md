@@ -2,8 +2,8 @@
 
 [← back to the index](../README.md)
 
-The same addressing function exists twice — once in C#, once in HLSL — and they have to agree
-exactly, forever. Here is why that was the right trade.
+The server decides what each player may see and sends nothing else; the client turns that into
+three soft fog states in one fullscreen pass.
 
 <!-- budget:inshort max=60 -->
 > **What it does.** Fog of war on both ends. **How it works.** The server rasterises per-player vision
