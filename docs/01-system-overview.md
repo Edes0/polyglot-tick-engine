@@ -4,6 +4,13 @@
 
 Four .NET projects, one dependency rule, and a loop that runs once a second.
 
+<!-- budget:inshort max=60 -->
+> **In short.** **Problem:** my first design let script results arrive after their tick had closed, and
+> determinism went with it. **Decision:** lockstep — the tick awaits every player's script, and a hard
+> kill bounds the wait. **Outcome:** same inputs, same world; tick time is bounded by the slowest
+> script, and the 200 ms kill caps that.
+<!-- /budget -->
+
 ---
 
 ## The layers
@@ -30,10 +37,10 @@ database, the HTTP API and the WebSocket broadcast. There is no second writer.
 
 | Project | Owns | Size |
 |---|---|--:|
-| `Screeps2.Domain` | Aggregates, value objects, domain services, repository interfaces | 114 files |
+| `Screeps2.Domain` | Aggregates, value objects, domain services, repository interfaces | 116 files |
 | `Screeps2.Application` | Tick reconciliation, pathfinding, vision, the player API facade, CQRS handlers | 292 files |
 | `Screeps2.Infrastructure` | EF Core, Docker execution, persistent workers, tick hosting, broadcast | 442 files |
-| `Screeps2.Presentation` | HTTP API, WebSockets, DI composition, startup validation | 84 files |
+| `Screeps2.Presentation` | HTTP API, WebSockets, DI composition, startup validation | 85 files |
 
 ## The loop
 

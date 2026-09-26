@@ -2,23 +2,32 @@
 
 [← back to the index](../README.md)
 
-1,350 tests is a number. The useful parts are the two suites that exist because .NET cannot reach
-them, and the rule that a green build proves less than it looks like it proves.
+1,603 passing test cases is a number. The useful parts are the two suites that exist because .NET
+cannot reach them, and the rule that a green build proves less than it looks like it proves.
+
+<!-- budget:inshort max=60 -->
+> **In short.** **Problem:** a green .NET build said nothing about the code bots actually run — the
+> Python worker suite sat red for weeks behind green CI. **Decision:** separate CI lanes for the
+> in-container workers, and a rule that wiring is proven on a running host. **Outcome:** 1,603 .NET
+> cases plus 247 worker cases on every push.
+<!-- /budget -->
 
 ---
 
 ## What exists
 
+Counts from the CI run of 2026-09-20:
+
 | Suite | Tests | Covers |
 |---|--:|---|
-| `Screeps2.Infrastructure.Tests` | 481 | DbContext, executors, persistent worker, Docker smoke |
-| `Screeps2.Application.Tests` | 456 | Tick reconciliation, handlers, wire-format contracts |
-| `Screeps2.Domain.Tests` | 269 | Aggregates, value objects, replay determinism |
-| `Screeps2.Presentation.Tests` | 144 | Controllers, startup configuration guards |
-| `tests/python` | 155 | The Python worker entrypoint |
+| `Screeps2.Infrastructure.Tests` | 529 | DbContext, executors, persistent worker (plus 9 opt-in Docker smoke tests) |
+| `Screeps2.Application.Tests` | 478 | Tick reconciliation, handlers, wire-format contracts |
+| `Screeps2.Domain.Tests` | 413 | Aggregates, value objects, replay determinism |
+| `Screeps2.Presentation.Tests` | 183 | Controllers, startup configuration guards |
+| `tests/python` | 222 | The Python worker entrypoint |
 | `tests/javascript` | 25 | The JS/TS worker entrypoint |
 
-Roughly 36,000 lines of test code against 80,000 lines of source. Plus 8 BenchmarkDotNet suites with
+Roughly 37,000 lines of test code against 80,000 lines of source. Plus 9 BenchmarkDotNet suites with
 [four committed baselines](05-performance-engineering.md).
 
 ## The suites that exist because `dotnet test` cannot reach them
@@ -113,4 +122,4 @@ The test count is the least interesting fact on this page. The parts I would def
 
 ---
 
-[← back to the index](../README.md)
+**Next:** [The trust boundary →](09-trust-boundary.md)

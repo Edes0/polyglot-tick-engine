@@ -5,6 +5,13 @@
 Twelve ordered phases, one batched flush, and a total order over every decision — because "same
 inputs, same world" is the property the whole game rests on.
 
+<!-- budget:inshort max=60 -->
+> **In short.** **Problem:** "same inputs, same world" is what the game rests on, and one unordered
+> tie-break quietly breaks it. **Decision:** twelve explicit phases, one batched flush, and a four-level
+> total order that ends in a unique id. **Outcome:** determinism enforced by replay and golden tests,
+> not by a comment — and two bugs caught that no stage-level test could see.
+<!-- /budget -->
+
 ---
 
 ## The phase list is the design document
@@ -68,10 +75,15 @@ services.AddScoped<IReadOnlyList<ITickPhase>>(sp =>
 ]);
 ```
 
-Three of those comments encode bugs that already happened. "One remover, not two" is there because
-having both the lifespan phase and the cull phase delete units meant a unit could be removed twice
-and the second removal threw. Ordering constraints that are only in someone's head are ordering
-constraints that get violated during the next refactor.
+Those comments encode bugs that already happened. "One remover, not two" is there because of a bug
+that ran the other way: combat never removed dead units at all. A unit could sit on the map at zero
+health for up to 1,500 ticks — counted by its owner's bot as a healthy soldier, driving enemy army
+production, standing in its cell as a permanent wall. The event meant to remove it had exactly one
+consumer, and that consumer wrote a debug log line. Only old age removed units.
+
+The fix is a cull phase that is the **only** remover — the lifespan phase lost its delete — so a new
+damage source cannot forget to clean up after itself. Ordering constraints that are only in
+someone's head are ordering constraints that get violated during the next refactor.
 
 ## Determinism is a test, not a comment
 
@@ -140,9 +152,31 @@ Player order itself is not insertion order either: the runnable set is sorted by
 rotated by tick, so a cap on scripts per tick cannot starve the tail of the list.
 
 Conflict resolution runs in three steps — occupancy projection, first-claim-per-target with
-stationary blocking, then cycle detection with a defined winner for the two-cycle case (two units
-swapping places is a cycle, but it is also a legal move, so it gets an exception with a canonical
-winner rather than both units being frozen).
+stationary blocking, then cycle detection.
+
+Cycle detection is where a green test suite hid a frozen colony. Every unit in a cycle used to be
+excluded from moving, with a canonical "winner" kept for the two-unit case. Each stage's unit tests
+passed. End to end, the winner was neutralised anyway — its excluded partner stayed put, on exactly
+the cell the winner meant to enter — so a closed ring of workers froze solid and re-issued the same
+move forever.
+
+Tight rotations are now exempt from exclusion. That is safe for a reason that can be stated in one
+line: every participant steps into the cell the next one vacates, so the end positions are a
+permutation of the start positions and nothing is doubly occupied.
+
+```csharp
+// src/Screeps2.Application/Tick/MoveCycleDetector.cs
+if (pathIndexByUnit.TryGetValue(curId, out var cycleStartIndex))
+{
+    var cycleLength = pathUnits.Count - cycleStartIndex;
+    if (isExemptCycle != null && isExemptCycle(pathUnits.GetRange(cycleStartIndex, cycleLength)))
+        break;
+```
+
+The exemption needs every unit in the ring to complete its step, so it does not yet fire for the
+slowest units — written down as a known limit rather than left for someone to rediscover. The lesson
+I kept: **a green unit test on a pipeline stage is not evidence about the pipeline.** The freeze
+survived because no test crossed the seam between stages.
 
 ## Pathfinding across a world that is secretly partitioned
 
