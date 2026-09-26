@@ -3,7 +3,8 @@
 <!-- budget:hook max=90 -->
 **Every second, the server must run every player's bot — code I have never seen — without letting
 one stall the tick, see what it should not, or break determinism.** A .NET 10 backend owns the world
-and sandboxes each bot in Docker, built for 24 languages; 1,603 .NET tests passed in CI on 2026-09-20.
+and sandboxes each bot in Docker behind one contract built for 24 languages; Python, JavaScript and
+TypeScript run live today.
 
 Designed and built solo over ~10 months by Andreas Sjögren — I make the decisions and review every merge; AI coding agents implement under gates I built (see Working with agents).
 
@@ -55,7 +56,7 @@ The interesting part is not the game. It is what the game forces you to build:
 |---|---|---|
 | [Decisions](docs/decisions.md) | Eleven forks this engine rests on | Each on one screen: the constraint, the rejected option, the cost accepted |
 | [01 System overview](docs/01-system-overview.md) | Script results arrived after their tick closed | I reversed my own async design for lockstep, and bounded the cost with a hard kill |
-| [02 Sandboxed polyglot execution](docs/02-polyglot-sandbox.md) | Code I have never seen, in any of 24 languages | Chose one language-neutral contract over per-language branches; adding a language never touches the tick |
+| [02 Sandboxed polyglot execution](docs/02-polyglot-sandbox.md) | Code I have never seen, in any of 24 languages | Chose one language-neutral contract over per-language branches; the tick never branches on language |
 | [03 Persistent-worker protocol](docs/03-persistent-worker-protocol.md) | A process per player per tick cost 50–100 ms | Chose a warm worker and a versioned line protocol; a scheduling race closed by construction |
 | [04 Tick pipeline and determinism](docs/04-tick-pipeline-and-determinism.md) | One unordered tie-break breaks "same inputs, same world" | Chose a total order ending in a unique id — and found two bugs no stage test could see |
 | [05 Performance engineering](docs/05-performance-engineering.md) | A 13× regression, and my wrong explanation of it | Chose to instrument first; halved it, and left three optimisations undone on purpose |

@@ -9,8 +9,8 @@ the tick down with it.
 <!-- budget:inshort max=60 -->
 > **In short.** **Problem:** code I have never seen, in any of the 24 languages the sandbox is built
 > for, must never touch the tick or another player. **Decision:** one language-neutral contract — a language is a descriptor plus
-> a command builder — and the host owns every timeout. **Outcome:** failures stay per-player, and adding
-> a language never touches the tick.
+> a command builder — and the host owns every timeout. **Outcome:** failures stay per-player, and the
+> tick never branches on language.
 <!-- /budget -->
 
 ---
