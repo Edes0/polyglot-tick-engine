@@ -8,7 +8,7 @@ exactly, forever. Here is why that was the right trade.
 <!-- budget:inshort max=60 -->
 > **What it does.** Fog of war on both ends. **How it works.** The server rasterises per-player vision
 > bitmaps with per-cell line of sight; the client renders one URP fullscreen pass driven by a distance
-> field. **Result.** Hidden units are never sent, and no shader can forget fog.
+> field. **Result.** Hidden units are never sent, and no opaque material can forget fog.
 <!-- /budget -->
 
 ---
