@@ -5,10 +5,10 @@
 Four .NET projects, one dependency rule, and a loop that runs once a second.
 
 <!-- budget:inshort max=60 -->
-> **In short.** **Problem:** my first design let script results arrive after their tick had closed, and
-> determinism went with it. **Decision:** lockstep — the tick awaits every player's script, and a hard
-> kill bounds the wait. **Outcome:** same inputs, same world; tick time is bounded by the slowest
-> script, and the 200 ms kill caps that.
+> **What it does.** Runs the whole game in four .NET layers behind one authoritative host.
+> **How it works.** Each second the tick awaits every player's script, reconciles the intents,
+> flushes once, and broadcasts a per-player delta. **Result.** Same inputs, same world — and a Unity
+> client that only renders.
 <!-- /budget -->
 
 ---

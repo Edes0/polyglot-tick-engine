@@ -7,10 +7,10 @@ twenty-four languages. It gets one CPU budget, one hard kill, one memory ceiling
 the tick down with it.
 
 <!-- budget:inshort max=60 -->
-> **In short.** **Problem:** code I have never seen, in any of the 24 languages the sandbox is built
-> for, must never touch the tick or another player. **Decision:** one language-neutral contract — a language is a descriptor plus
-> a command builder — and the host owns every timeout. **Outcome:** failures stay per-player, and the
-> tick never branches on language.
+> **What it does.** Runs untrusted bots from a sandbox built for 24 languages; Python, JavaScript and
+> TypeScript run live today. **How it works.** A language is a descriptor plus a command builder, and
+> every run gets a CPU budget, a 200 ms hard kill, 256 MiB and a 1 MiB output cap. **Result.**
+> Failures stay per-player.
 <!-- /budget -->
 
 ---
