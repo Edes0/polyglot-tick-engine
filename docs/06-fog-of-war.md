@@ -5,6 +5,13 @@
 The same addressing function exists twice — once in C#, once in HLSL — and they have to agree
 exactly, forever. Here is why that was the right trade.
 
+<!-- budget:inshort max=60 -->
+> **In short.** **Problem:** fog is a rule on the server and an effect on the client, and conflating
+> them leaks information. **Decision:** the server omits what a player cannot see; the client renders
+> fog in one fullscreen pass, not per shader. **Outcome:** a new material cannot leak the world, at the
+> price of one mapping written twice, pinned by tests.
+<!-- /budget -->
+
 ---
 
 ## Two halves of one feature
@@ -136,10 +143,11 @@ make it survivable:
    the failure mode — a sampler that is subtly off by half a texel at room seams — is invisible
    until someone screenshots exactly the wrong spot.
 
-The alternative was pushing the mapping into a lookup texture to keep one implementation. That
-trades a per-pixel dependent texture read for arithmetic the GPU does effectively for free, in the
-hot fullscreen pass, to avoid seven lines of duplication. The measured version of the trade is not
-close.
+The alternative was pushing the mapping into a lookup texture to keep one implementation. That would
+add a per-pixel dependent texture read to the hot fullscreen pass to save seven lines of arithmetic
+the GPU does in registers. I have not benchmarked the lookup-texture version; that is reasoning, not
+a measurement, and it is labelled as such here. The layout choice that *was* made explicitly — one
+atlas texture over a texture array, one bind and one sample — is recorded in the fog spec.
 
 ## Where the fog gets its shape
 

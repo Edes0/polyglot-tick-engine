@@ -5,11 +5,18 @@
 Eight thousand lines that depend on nothing, a handful of decisions I wrote down before I could
 forget why, and one value object that changed shape because of a measurement.
 
+<!-- budget:inshort max=60 -->
+> **In short.** **Problem:** a domain rots through stale comments and convenient APIs. **Decision:** a
+> Domain layer that depends on nothing, ADRs that carry a `revisit_if`, and one API rule — hide engine
+> mechanics, never do the player's programming. **Outcome:** tombstone comments that nearly bought a
+> 120-file refactor were caught, and growing the world is one config change.
+<!-- /budget -->
+
 ---
 
 ## The layer that depends on nothing
 
-`Screeps2.Domain` references no EF, no MediatR, no ASP.NET, no IO. 114 files: 10 aggregate roots,
+`Screeps2.Domain` references no EF, no MediatR, no ASP.NET, no IO. 116 files: 10 aggregate roots,
 33 value objects, 11 domain events, domain services, and a `Result`-based error model rather than
 exceptions for rule violations.
 

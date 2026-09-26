@@ -2,17 +2,25 @@
 
 [← back to the index](../README.md)
 
-Every tick, code I have never seen runs on my server. Twenty-four languages of it. It gets one CPU
-budget, one hard kill, one memory ceiling, and no way to take the tick down with it.
+Every tick, code I have never seen runs on my server, and the sandbox is built to take it in
+twenty-four languages. It gets one CPU budget, one hard kill, one memory ceiling, and no way to take
+the tick down with it.
+
+<!-- budget:inshort max=60 -->
+> **In short.** **Problem:** code I have never seen, in any of the 24 languages the sandbox is built
+> for, must never touch the tick or another player. **Decision:** one language-neutral contract — a language is a descriptor plus
+> a command builder — and the host owns every timeout. **Outcome:** failures stay per-player, and the
+> tick never branches on language.
+<!-- /budget -->
 
 ---
 
 ## The shape of the problem
 
-A player uploads a bot. It might be Haskell. It might allocate until the box swaps, fork until the
-process table is full, block on a socket forever, or return 400 MB of stdout. The engine has to call
-it once per second, take whatever it produced, and be ready to do it again — while another player's
-Rust bot is doing something else wrong in parallel.
+A player uploads a bot. The sandbox has to assume it might be Haskell. It might allocate until the box
+swaps, fork until the process table is full, block on a socket forever, or return 400 MB of stdout.
+The engine has to call it once per second, take whatever it produced, and be ready to do it again —
+while another player's bot is doing something else wrong in parallel.
 
 Three things fall out of that:
 
@@ -22,7 +30,7 @@ Three things fall out of that:
    when it hangs.
 3. **Failure must be per-player.** Not per-tick, not per-server.
 
-## One contract, twenty-four languages
+## One contract, built for twenty-four languages
 
 bash · C · C++ · C# · F# · Clojure · Go · Groovy · Haskell · Java · JavaScript · Kotlin · Lua ·
 OCaml · Perl · PHP · PowerShell · Python · R · Ruby · Rust · Scala · Swift · TypeScript
@@ -30,6 +38,9 @@ OCaml · Perl · PHP · PowerShell · Python · R · Ruby · Rust · Scala · Sw
 75 Docker images across the version matrix — Python alone spans 3.8 to 3.13, Rust four versions,
 Java four. A language is a **descriptor plus a command builder**, registered into DI. Nothing in the
 tick path branches on which one it is.
+
+Python, JavaScript and TypeScript run on the live persistent-worker protocol today. The other 21 have
+images and build pipelines; each is one worker entrypoint away — that port is the work in progress.
 
 ```csharp
 // src/Screeps2.Infrastructure/Sandbox/ILanguageRuntime.cs
@@ -99,7 +110,8 @@ Canonical, and enforced per execution:
 | Max output | 1 MiB | Truncated, not buffered to death |
 | CPU bucket cap | 10,000 ms | Burst allowance for pathfinding and planning spikes |
 | Max open files | 65,536 | |
-| Max processes | 65,535 | Deliberately high — see below |
+| Max processes (per-process `nproc`) | 65,535 for most images; 512 for TypeScript | Deliberately high — see below |
+| Processes per container (`PidsLimit`) | 512 | The cap that actually holds |
 
 The soft timeout is derived, not configured: `min(bucketCurrentCpu, hardKillMs)`. A player who has
 banked CPU gets more of it; nobody gets past the hard kill.
@@ -113,9 +125,12 @@ better code, not a punishment.
 65,535 looks like someone gave up on limiting processes. What actually happened: the TypeScript
 image runs `tsc` inside the container, `tsc` forks aggressively, and a sane process cap made it die
 with `vfork: Resource temporarily unavailable` — intermittently, under load, which is the worst way
-to find out. Limits are per-language overridable for exactly this reason, and TypeScript carries
-raised process and file-handle values. The real containment for a fork bomb is the memory ceiling
-and the hard kill, and both hold regardless.
+to find out. Limits are per-language overridable for exactly this reason, and TypeScript carries its
+own raised process and file-handle values.
+
+The per-process number is not what contains a fork bomb. The container's own PID limit — 512 — caps
+every process in it, and the memory ceiling and the hard kill hold regardless. The limit that looks
+alarming is the one that does not matter, and the one that matters is a line further down.
 
 I left the number where it is and wrote down why. That is worth more than a tidier-looking config.
 
@@ -162,33 +177,24 @@ Above that sits the escalation ladder:
   `DisabledDueToInstability`. The player is told. The engine stops paying for it.
 - **Container lost out of band** — detected and recreated on the next execution.
 
-## One piece of ordinary hygiene
+That last rung exists because of a run that died. Around tick 300 both worker containers vanished
+underneath the engine, every skipped tick was counted as the player's runtime error, and both scripts
+crossed the instability threshold — 52% failures — and were disabled for good. A Docker blip had been
+charged to the players. Skips caused by a missing channel now record their own status,
+`InfrastructureUnavailable`, which the auto-disable window does not count as a failure. Code that
+starts and then errors or times out is still the player's.
 
-The committed development JWT key is a placeholder, and a startup guard makes sure it can never be
-the deployed one:
+## Why not Judge0 or Piston
 
-```csharp
-// src/Screeps2.Presentation/Configuration/JwtSecretGuard.cs
-public const string PlaceholderMarker = "ChangeInProduction";
+Both exist, both are good, and I read them closely — the container lifecycle and resource-limit
+handling here borrow their patterns, and the code says so where it does. What they are built for is a
+stateless job: submit code, get stdout. This is a function the engine calls once per tick against a
+frozen snapshot, whose output is intents merged into a deterministic simulation, where one player's
+timeout must never hold up the others. That is a different shape of problem, so it got its own
+executor rather than an adapter around someone else's.
 
-public static void Validate(string? jwtSecretKey, bool isDevelopment)
-{
-    if (isDevelopment) return;
-
-    var secret = jwtSecretKey ?? string.Empty;
-    if (secret.Contains(PlaceholderMarker, StringComparison.OrdinalIgnoreCase))
-    {
-        throw new InvalidOperationException(
-            "Game:PlayerApi:JwtSecretKey is still the development placeholder. A non-Development " +
-            "deployment must set a strong secret via the Game__PlayerApi__JwtSecretKey " +
-            "environment variable.");
-    }
-}
-```
-
-A test reads the *committed* `appsettings.json` and asserts the placeholder marker is still present —
-so if anyone ever swaps the dev placeholder for a real-looking secret, the test fails and explains
-why. The guard and the test cover opposite directions of the same mistake.
+The sandbox's security hygiene — tokens, auth schemes, what the server is allowed to send — is in
+[The trust boundary](09-trust-boundary.md).
 
 ---
 

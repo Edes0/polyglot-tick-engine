@@ -5,6 +5,13 @@
 Starting a process per player per tick is a thousand milliseconds of `docker exec` you do not have.
 So the process stays up, and the host talks to it over a versioned line protocol it can hang up on.
 
+<!-- budget:inshort max=60 -->
+> **In short.** **Problem:** a `docker exec` per player per tick cost 50–100 ms each, inside a 1,000 ms
+> budget. **Decision:** one long-lived worker per player, a versioned JSON-line protocol, and a
+> snapshot captured when the work is scheduled rather than when it runs. **Outcome:** 1–5 ms per player
+> per tick, and a scheduling race closed by construction.
+<!-- /budget -->
+
 ---
 
 ## Why a long-lived worker

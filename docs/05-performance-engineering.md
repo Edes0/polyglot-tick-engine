@@ -5,6 +5,13 @@
 The useful story here is not a number that got smaller. It is the time I was confident about the
 cause, wrote it down, and was wrong — and what the instrument said instead.
 
+<!-- budget:inshort max=60 -->
+> **In short.** **Problem:** a rewrite made move preparation 13× slower on green tests, and my written
+> explanation for the allocation was wrong. **Decision:** instrument before refactoring, and ship only
+> what the attribution justifies. **Outcome:** 2,821 → 1,409 ms and 450 → 99 MB at 5,000 entities, with
+> three optimisations deliberately left undone and their numbers kept.
+<!-- /budget -->
+
 **Every measurement below:** one desktop, Ryzen 7 7700X, .NET 10, BenchmarkDotNet with the
 in-process toolchain, 5 warmup / 15 iterations, at 100 / 1,000 / 5,000 simulated entities. This is a
 pre-alpha project with no external players. These are not production throughput figures.
