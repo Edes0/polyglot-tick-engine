@@ -212,9 +212,10 @@ see, because the value was never serialised for that player. Caching the vision 
 structures cut the pass from 6.69 ms to 4.17 ms (−38%) at 5,000 entities across 4 players; unit
 footprints are not cached, because units move every tick.
 
-**On the client**, fog is a single URP fullscreen pass running at `BeforeRenderingTransparents`,
-gating every opaque pixel. Fog used to be sampled in every shader; it is now one pass, so a new opaque
-material cannot forget it. The pass reconstructs world XZ from depth, samples visibility, blends three
+**On the client** — here the Unity client, archived in October 2026 when Godot became the only
+client — fog is a single URP fullscreen pass running at `BeforeRenderingTransparents`, gating every
+opaque pixel. Fog used to be sampled in every shader; it became one pass, so a new opaque material
+cannot forget it. The pass reconstructs world XZ from depth, samples visibility, blends three
 state weights (unseen, explored, visible), and composites two independent volumetric layers, each with
 its own colour, density, cloud-noise strength, scale, contrast and drift. It depth-gates the skybox
 out and masks the volume to the map footprint: the visibility texture is clamp-wrapped, so without

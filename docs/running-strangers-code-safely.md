@@ -1,17 +1,17 @@
 # Running strangers' code safely
 
-![Diagram: each player's bot runs in its own sealed container with a 200 ms cut-off, 256 MiB of memory and 1 MiB of output; once a second the game server sends each bot its view and collects its orders; a crashed bot loses only its own turn](../media/diagram-sandbox.svg)
+![Diagram: each player's bot runs in its own sealed container with 150 ms of CPU per tick, a 200 ms hard kill, 256 MiB of memory and 1 MiB of output; once a second the game server sends each bot its view and collects its orders; a crashed bot loses only its own turn](../media/diagram-sandbox.svg)
 
 Every second, my server runs code written by players it has never met. Each bot runs sealed off on its
 own, with hard limits, answers in a few milliseconds, and is sent only what its player is allowed to
 see. A bot that crashes or misbehaves loses its own turn, never the game, and one player's private
 data is never sent to another.
 
-- **3 languages running today, 24 prepared** — Python, JavaScript and TypeScript run now; the other
-  21 are packaged and one step from running.
-- **Every language plays by the same rules** — each bot is cut off after 200 ms and gets a fixed amount
+- **24 languages listed, 1 running end to end** — Python runs now. The game offers only languages
+  that run; the other 23 each still miss a starter, a build recipe or a worker.
+- **Every language plays by the same rules** — each bot gets 150 ms of CPU per tick and a fixed amount
   of memory, so no language has an edge; time it doesn't use is saved for later, rewarding efficient
-  code.
+  code, and nothing runs past a 200 ms hard kill.
 - **Bots stay loaded** — each answers in 1–5 ms, down from 50–100 ms.
 - **Nothing private leaks** — tests check exactly what each player receives, not what the screen
   shows.
@@ -33,8 +33,10 @@ OCaml · Perl · PHP · PowerShell · Python · R · Ruby · Rust · Scala · Sw
 Java four. A language is a **descriptor plus a command builder**, registered into DI. Nothing in the
 tick path branches on which one it is.
 
-Python, JavaScript and TypeScript run on the live persistent-worker protocol today. The other 21 have
-images and build pipelines; each is one worker entrypoint away — that port is the work in progress.
+Only Python runs end to end today. An audit on 2026-11-01 walked every language from starter to a
+run: JavaScript, TypeScript and Go have no starter that reaches a run, 11 compiled languages have no
+build recipe, and 9 have no worker entrypoint. Since then the game offers only the languages that run,
+and the rest are the work in progress.
 
 ```csharp
 // src/BotGame.Infrastructure/Sandbox/ILanguageRuntime.cs
@@ -435,7 +437,7 @@ opposite directions of the same mistake.
 | **Problem** | Start-up plus a round-trip per player per tick was most of the budget, and the default configuration ran no scripts. |
 | **Options** | Exec per tick (rejected: cost) · warn and continue (rejected: silent failure) · **a warm worker, required at start-up** |
 | **Chosen** | Versioned JSON lines over TCP, stdio fallback; any validator error or missing image mapping stops the server. |
-| **Outcome** | ~1–5 ms per player per tick; no silent no-op servers — and a language without a worker cannot run: 21 of 24 today. |
+| **Outcome** | ~1–5 ms per player per tick; no silent no-op servers — and a language without a worker cannot run: 9 of 24 lack one (audit of 2026-11-01). |
 | **Lesson** | Read state when work is scheduled, not when it runs. |
 <!-- /budget -->
 

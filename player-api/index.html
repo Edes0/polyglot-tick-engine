@@ -651,7 +651,7 @@ target = <span class="tok-fn">min</span>(reachable, key=<span class="tok-key">la
             <span class="tok-key">else</span>:
                 unit.<span class="tok-fn">moveTo</span>(home.position.x, home.position.y)</code></pre>
 
-  <p class="lang-tab">JavaScript</p>
+  <p class="lang-tab">JavaScript (not offered in the game yet)</p>
   <pre><code><span class="tok-key">function</span> <span class="tok-fn">play</span>(game) {
     <span class="tok-key">const</span> hatcheries = game.structures.<span class="tok-fn">filter</span>(s =&gt; s.type === <span class="tok-str">"hatchery"</span>);
     <span class="tok-key">if</span> (!hatcheries.length) <span class="tok-key">return</span>;
@@ -687,14 +687,16 @@ module.exports = { play };</code></pre>
 <!-- 10 -->
 <section id="langs">
   <h2><span class="num">10</span> Languages &amp; the HTTP bridge</h2>
-  <p class="sub">The object API above is the canonical surface. The sandbox is built for 24 languages; not every one reaches this API yet — here's the honest state.</p>
+  <p class="sub">The object API above is the canonical surface. The server lists 24 languages; only Python runs end to end today, and the game offers only the languages that run. Here's the honest state, from an audit on 2026-11-01.</p>
 
   <div class="table-scroll">
     <table>
       <thead><tr><th>Language</th><th>State today</th></tr></thead>
       <tbody>
-        <tr><td><b>Python</b>, <b>JavaScript</b>, <b>TypeScript</b></td><td>The full <code>Game</code> / <code>Unit</code> / <code>Structure</code> / <code>Resource</code> / <code>Position</code> object API documented here, via a persistent worker.</td></tr>
-        <tr><td>The other 21 (Go, Rust, C#, Java, Ruby, C/C++, Lua, Kotlin, …)</td><td>Docker images and build pipelines exist; each is waiting on its persistent-worker entrypoint. Until it lands, bots in these languages do not run: the older per-tick path they would have used is deliberately switched off, and the server refuses to start if anyone tries to switch it back on.</td></tr>
+        <tr><td><b>Python</b></td><td>Runs end to end: the full <code>Game</code> / <code>Unit</code> / <code>Structure</code> / <code>Resource</code> / <code>Position</code> object API documented here, via a persistent worker.</td></tr>
+        <tr><td>JavaScript, TypeScript, Go</td><td>No starter that reaches a run yet, so the game does not offer them. The JavaScript and TypeScript worker implements the object API above.</td></tr>
+        <tr><td>11 compiled languages</td><td>No build recipe yet.</td></tr>
+        <tr><td>9 more</td><td>No persistent-worker entrypoint yet. Until one lands, bots in these languages do not run: the older per-tick path they would have used is deliberately switched off, and the server refuses to start if anyone tries to switch it back on.</td></tr>
       </tbody>
     </table>
   </div>

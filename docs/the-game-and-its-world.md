@@ -2,29 +2,32 @@
 
 ![A black many-legged creature walking across sand, its legs placed procedurally](../media/evo-clip-locomotion.gif)
 
-I rebuilt the look of this 3D world four times without changing the game's rules, because the game
-runs on the server and the app you watch it in only draws what the server sends. Every player's
+*The Unity client, 2026: an earlier client, archived in October 2026.*
+
+I rebuilt the client this world is watched in several times without changing the game's rules,
+because the game runs on the server and the client only draws what the server sends. Every player's
 colony — its base and its creatures — lives here, and you can watch the players' bots steer them. A
 new look could even be built by someone else.
 
 - **One seamless world** — generated as one landscape, with no visible seams.
-- **Creatures whose legs are placed by code** as they walk.
-- **Watch from a browser**, with nothing to install.
-- **Built with four different game tools**, November 2025 to February 2026, before settling on Unity
-  3D.
+- **Creatures whose legs are placed by code** as they walk, in the Unity client.
+- **One client, in Godot**, since October 2026. There is no browser view yet: Godot cannot export C#
+  to the web.
+- **Built with four different game tools** — Godot, Unity 2D, Unreal and Unity 3D — before settling on
+  Godot. Every picture on this page is from an earlier client.
 
 ---
 
-## Four engines
+## Five clients
 
-This is my first game, built solo, and I did not know what I wanted it to look like. So I built it
-four times, mostly to find out.
+This is my first game, built solo, and I did not know what I wanted it to look like. So I built the
+client five times, mostly to find out.
 
 ### Godot, 2D hexagons — November 2025
 
 ![A hexagonal 2D map in Godot: dark ground, grey rock veins and pockets, and a single green unit](../media/evo-1-godot-hex.webp)
 
-*Godot, 2025-11-06. The first world: one hexagonal room, generated rock veins, one unit.*
+*Godot, 2025-11-06, the first client. The first world: one hexagonal room, generated rock veins, one unit.*
 
 A minimal Godot frontend over a hexagonal room. It lasted six days; the commit that ended it is titled
 "We gonna go to Unity". The migration plan written at the time names why: C# on both sides of the
@@ -34,7 +37,7 @@ wire, full 3D lighting, an orthographic camera for a strategy-game view, and the
 
 ![A hexagonal map in Unity: pale ground radiating from a central clearing, dark rock masses, a "Status: Connected" label](../media/evo-2-unity2d-hex.webp)
 
-*Unity, 2025-11-15. The same hexagonal room, now rendered by a client connected to the live server.*
+*Unity, 2025-11-15, an earlier client. The same hexagonal room, now rendered by a client connected to the live server.*
 
 The Unity 2D client kept the hexagonal grid and grew it: by the end of November there were 49
 hex-named files across the backend and the client.
@@ -43,7 +46,7 @@ hex-named files across the backend and the client.
 
 ![A procedurally generated forest on sandy hills in Unreal Engine, with editor gizmos visible](../media/evo-3-unreal-pcg.webp)
 
-*Unreal Engine, 2025-12-07. Procedurally placed trees on generated terrain.*
+*Unreal Engine, 2025-12-07, an earlier client. Procedurally placed trees on generated terrain.*
 
 Then I went looking for a look. Unreal's procedural content framework could fill a landscape with
 forests and rock that Unity 2D could not, and the move to it deleted all 49 hex files. It did not last
@@ -54,26 +57,33 @@ one person learning to make a first game.
 
 ![Eroded 3D terrain on a square tile in the Unity editor, viewed from above at an angle](../media/evo-4-unity3d-terrain.webp)
 
-*Unity 3D (URP), 2026-05-22. Eroded terrain on the rectangular room grid.*
+*Unity 3D (URP), 2026-05-22, an earlier client. Eroded terrain on the rectangular room grid.*
 
 Five days after the Unreal commit, a Unity 3D project on the Universal Render Pipeline replaced it.
-That is the client today: Unity 6, URP, and the six modules described below.
+It was the client until October 2026: Unity 6, URP, and the six modules described below.
+
+### Godot — from October 2026
+
+Unity and Godot ran side by side over the same WebSocket stream for a while. Keeping two live meant
+every visual and wire change was done twice, or one of them rotted. In October 2026 Godot became the
+only client, built in Godot 4.7 with C#, and Unity is archived. Godot cannot export C# to the web, so
+there is no browser view until a separate viewer is built.
 
 ## The client
 
-The Unity client is a **visualiser**. It fetches the room once over REST, then consumes a
-zlib-compressed WebSocket delta stream. It applies spawn and unit commands ahead of the server for
-responsiveness, and the next delta confirms or corrects them. It never decides gameplay state — if the
-client and the server disagree, the client is wrong by construction.
+The client is a **visualiser** over the server's WebSocket delta stream. It never decides gameplay
+state — if the client and the server disagree, the client is wrong by construction. The Unity client
+fetched the room once over REST, then consumed the zlib-compressed delta stream; it applied spawn and
+unit commands ahead of the server for responsiveness, and the next delta confirmed or corrected them.
 
-That is what made four clients survivable: none of them owned the game. The simulation has lived in
+That is what made five clients survivable: none of them owned the game. The simulation has lived in
 its own backend project since the first commit, and a client renders what it is sent. Each engine
 change still meant real backend work — those commits touched between 33 and 321 backend files, as
 data shapes and world generation changed — but the game's rules were never the thing being rewritten.
-It is also what makes the browser view cheap: a different renderer over the same feed, not a second
-implementation of the game.
+It is also what makes a later browser viewer cheap: a different renderer over the same feed, not a
+second implementation of the game.
 
-The client is six assemblies with a compile-time-enforced dependency graph:
+The Unity client, now archived, was six assemblies with a compile-time-enforced dependency graph:
 
 ```mermaid
 flowchart LR
@@ -100,7 +110,7 @@ reaching upward. There is no `InternalsVisibleTo` anywhere; crossing a boundary 
 `public`, which makes every crossing deliberate and visible in review.
 
 Unity does not enforce architecture for you. Assembly definitions are the one mechanism that turns a
-layering intention into a compile error, which is why the client has six of them and not one
+layering intention into a compile error, which is why that client had six of them and not one
 `Assembly-CSharp`.
 
 ## The map
@@ -132,17 +142,18 @@ watch. The rule written for it:
 > tick that snaps.
 
 Unit movement was slowed to a tenth of its original pace for watching, then raised to three tenths.
-The browser watch client exists because the easiest way to watch is not to install anything.
+The easiest way to watch would be a browser, with nothing to install; that waits for a separate
+viewer, because Godot cannot export C# to the web.
 
 ![Deep fog over dark 3D terrain, with a lit visibility marker and a small unit in the distance](../media/evo-5-unity3d-fog.webp)
 
-*2026-05-23. Early volumetric fog over the 3D terrain.*
+*Unity, 2026-05-23, an earlier client. Early volumetric fog over the 3D terrain.*
 
 ![A lit oval clearing in dark rocky terrain under a starry sky, the green colony at its centre](../media/evo-6-colony-clearing.webp)
 
-*2026-06-04. A colony's clearing: what one player can see, and the dark they cannot.*
+*Unity, 2026-06-04, an earlier client. A colony's clearing: what one player can see, and the dark they cannot.*
 
-The fog of war took four stages to look right. How it works is on
+In the Unity client the fog of war took four stages to look right. How it works is on
 [What happens every second](what-happens-every-second.md#fog-of-war).
 
 **Flat, before any fog or lighting** — the terrain mesh and a small visible clearing around the
@@ -150,26 +161,34 @@ colony. Correct, and dead.
 
 ![Flat-shaded terrain with a small visible clearing](../media/01-flat-no-fog.png)
 
+*Unity, an earlier client.*
+
 **Volumetric fog, over-tuned** — two fog layers doing their job and then some. Atmospheric, and
 close to unplayable: you cannot see your own units.
 
 ![Heavy volumetric fog over eroded terrain, a drone silhouette in the visible clearing](../media/02-volumetric-fog.png)
+
+*Unity, an earlier client.*
 
 **The three states, with soft borders** — unseen, explored, and visible, blended rather than
 stencilled, with the fog height ramp driven by distance from vision.
 
 ![Fog gating showing unseen, explored and visible regions blended across the terrain](../media/03-fog-states.png)
 
+*Unity, an earlier client.*
+
 **Tuned** — the visible region reads clearly, explored terrain stays legible, and the unseen world
 recedes without becoming a black hole.
 
 ![Tuned result: eroded terrain, a lit clearing containing a hatchery and a drone, under a night sky](../media/04-tuned.png)
 
+*Unity, an earlier client.*
+
 And the creatures that live in it:
 
 ![A glowing green insect-like creature model, turning on a dark background](../media/evo-clip-creature.gif)
 
-*Creature model, 2026-05-03.*
+*Creature model, Unity, 2026-05-03, an earlier client.*
 
 ## Decisions behind this
 
