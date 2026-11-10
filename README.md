@@ -1,41 +1,45 @@
-# A programmable bot game — players write the bots, and the bots play
+# Autonomy — a programmable bot game: players write the bots, and the bots play
 
 Players write code for their bots, upload it, and the bots play on their own in one shared world. My
 server runs every player's bot once a second, each sealed in its own sandbox, so a broken or hostile
-bot can't hurt the game. It's built for 24 programming languages; Python, JavaScript and TypeScript
-run live today.
+bot can't hurt the game. The server lists 24 programming languages; Python runs end to end today, and
+the game offers only the languages that run.
 
-Designed and built solo over ~10 months by Andreas Sjögren. I make every design decision and review every change; AI coding agents write code under checks I set up.
+Designed and built solo since November 2025 by Andreas Sjögren. I make every design decision and review every change; AI coding agents write code under checks I set up.
 
 Backend .NET engineer. A write-up of my ongoing passion project, which I intend to finish; no buildable source ([why](#why-there-is-no-source-here)).
 
 ![The world as a bot sees it: eroded terrain, a fog-of-war clearing around the colony, a hatchery, and a procedurally-legged drone](media/04-tuned.png)
 
+*The Unity client, June 2026: an earlier client, archived in October 2026.*
+
 ## What I built
 
-- **A server that runs everyone's code, every second.** A bot that runs past 200 ms is cut off; it
-  loses its turn, never the game.
+- **A server that runs everyone's code, every second.** Each bot gets 150 ms of CPU per tick and is
+  cut off past its limit; it loses its turn, never the game.
 - **Fast enough for a crowd.** Each bot answers in 1–5 ms, down from 50–100 ms.
 - **No peeking through the fog of war.** Hidden enemy units are never sent to a player.
-- **A 3D world to watch.** A Unity client with procedural terrain and creatures, and a browser view
-  with nothing to install.
-- **Four game engines tried, one kept.** Godot, Unity 2D and Unreal came before the Unity 3D world
-  you see here.
+- **One client, in Godot.** It only draws what the server sends. There is no browser view yet: Godot
+  cannot export C# to the web.
+- **Four clients built, one kept.** Godot, Unity 2D, Unreal and Unity 3D came first; since October
+  2026 Godot is the only client and the others are archived. The pictures here are from those earlier
+  clients.
 
 <table><tr>
-<td width="33%"><img src="media/evo-1-godot-hex.webp" alt="The first world: a 2D hexagonal map in Godot"><br><sub>Nov 2025 — Godot, 2D hexagons</sub></td>
-<td width="33%"><img src="media/evo-4-unity3d-terrain.webp" alt="Eroded 3D terrain in the Unity editor"><br><sub>May 2026 — Unity 3D terrain</sub></td>
-<td width="33%"><img src="media/evo-6-colony-clearing.webp" alt="A colony's lit clearing in dark terrain"><br><sub>Jun 2026 — a colony's clearing</sub></td>
+<td width="33%"><img src="media/evo-1-godot-hex.webp" alt="The first world: a 2D hexagonal map in Godot"><br><sub>Nov 2025 — the first Godot client, 2D hexagons</sub></td>
+<td width="33%"><img src="media/evo-4-unity3d-terrain.webp" alt="Eroded 3D terrain in the Unity editor"><br><sub>May 2026 — Unity 3D terrain, an earlier client</sub></td>
+<td width="33%"><img src="media/evo-6-colony-clearing.webp" alt="A colony's lit clearing in dark terrain"><br><sub>Jun 2026 — a colony's clearing, Unity, an earlier client</sub></td>
 </tr></table>
 
 ## By the numbers
 
 | | |
 |---|---|
-| Languages the sandbox is built for | 24, with 3 live today |
-| Automated tests | 1,850 passing |
-| Server code | ~80,000 lines of C# |
-| Built | solo, ~10 months, 379 commits |
+| Languages the server lists | 24, with Python running end to end |
+| Automated tests | 1,850 passing (CI run of 2026-09-20) |
+| Server code | ~80,000 lines of C# (2026-09-20) |
+| Dated specs | over 200 |
+| Built | solo, since November 2025 |
 
 ## Explore
 
@@ -50,7 +54,7 @@ Backend .NET engineer. A write-up of my ongoing passion project, which I intend 
 ## Stack
 
 .NET 10 · ASP.NET Core · EF Core · MediatR · Docker · WebSockets / SignalR · xUnit ·
-BenchmarkDotNet · Unity 6 (URP, HLSL) · GitHub Actions
+BenchmarkDotNet · Godot 4.7 (C#) · GitHub Actions
 
 ## Why there is no source here
 
